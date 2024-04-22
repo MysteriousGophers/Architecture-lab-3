@@ -1,4 +1,4 @@
-module github.com/roman-mazur/architecture-lab-3
+module github.com/mysteriousgophers/architecture-lab-3
 
 go 1.22
 
