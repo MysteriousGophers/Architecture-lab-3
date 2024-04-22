@@ -39,6 +39,38 @@ func TestLoop_Post_Success(t *testing.T) {
 	screenMock.AssertCalled(t, "NewTexture", image.Pt(400, 400))
 }
 
+func TestLoop_Post_Multiple_Success(t *testing.T) {
+	screenMock := new(mockScreen)
+	textureMock := new(mockTexture)
+	receiverMock := new(mockReceiver)
+
+	texture := image.Pt(400, 400)
+	screenMock.On("NewTexture", texture).Return(textureMock, nil)
+	receiverMock.On("Update", textureMock).Return()
+	loop := Loop{
+		Receiver: receiverMock,
+	}
+
+	loop.Start(screenMock)
+
+	operation1 := new(mockOperation)
+	operation2 := new(mockOperation)
+	textureMock.On("Bounds").Return(image.Rectangle{})
+	operation1.On("Do", textureMock).Return(true)
+	operation2.On("Do", textureMock).Return(true)
+
+	assert.Empty(t, loop.mq.ops)
+	loop.Post(operation1)
+	loop.Post(operation2)
+	time.Sleep(1 * time.Second)
+	assert.Empty(t, loop.mq.ops)
+
+	operation1.AssertCalled(t, "Do", textureMock)
+	operation2.AssertCalled(t, "Do", textureMock)
+	receiverMock.AssertCalled(t, "Update", textureMock)
+	screenMock.AssertCalled(t, "NewTexture", image.Pt(400, 400))
+}
+
 type mockScreen struct {
 	mock.Mock
 }
