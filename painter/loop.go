@@ -1,9 +1,8 @@
 package painter
 
 import (
-	"image"
-
 	"golang.org/x/exp/shiny/screen"
+	"image"
 )
 
 // Receiver отримує текстуру, яка була підготовлена в результаті виконання команд у циклі подій.
@@ -31,19 +30,30 @@ func (l *Loop) Start(s screen.Screen) {
 	l.next, _ = s.NewTexture(size)
 	l.prev, _ = s.NewTexture(size)
 
-	// TODO: стартувати цикл подій.
+	l.stop = make(chan struct{})
+	go func() {
+		for !l.stopReq || !l.mq.empty() {
+			op := l.mq.pull()
+			if update := op.Do(l.next); update {
+				l.Receiver.Update(l.next)
+				l.next, l.prev = l.prev, l.next
+			}
+		}
+		close(l.stop)
+	}()
 }
 
 // Post додає нову операцію у внутрішню чергу.
 func (l *Loop) Post(op Operation) {
-	if update := op.Do(l.next); update {
-		l.Receiver.Update(l.next)
-		l.next, l.prev = l.prev, l.next
-	}
+	l.mq.push(op)
 }
 
 // StopAndWait сигналізує про необхідність завершити цикл та блокується до моменту його повної зупинки.
 func (l *Loop) StopAndWait() {
+	l.Post(OperationFunc(func(t screen.Texture) {
+		l.stopReq = true
+	}))
+	<-l.stop
 }
 
 // TODO: Реалізувати чергу подій.
