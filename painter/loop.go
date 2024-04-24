@@ -22,7 +22,7 @@ type Loop struct {
 	stopReq bool
 }
 
-var size = image.Pt(400, 400)
+var size = image.Pt(800, 800)
 
 func (l *Loop) Start(s screen.Screen) {
 	l.next, _ = s.NewTexture(size)

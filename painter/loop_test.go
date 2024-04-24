@@ -17,7 +17,7 @@ func TestLoop_Post_Success(t *testing.T) {
 	textureMock := new(mockTexture)
 	receiverMock := new(mockReceiver)
 
-	texture := image.Pt(400, 400)
+	texture := image.Pt(800, 800)
 	screenMock.On("NewTexture", texture).Return(textureMock, nil)
 	receiverMock.On("Update", textureMock).Return()
 	loop := Loop{
@@ -36,7 +36,7 @@ func TestLoop_Post_Success(t *testing.T) {
 
 	operation1.AssertCalled(t, "Do", textureMock)
 	receiverMock.AssertCalled(t, "Update", textureMock)
-	screenMock.AssertCalled(t, "NewTexture", image.Pt(400, 400))
+	screenMock.AssertCalled(t, "NewTexture", image.Pt(800, 800))
 }
 
 func TestLoop_Post_Multiple_Success(t *testing.T) {
@@ -44,7 +44,7 @@ func TestLoop_Post_Multiple_Success(t *testing.T) {
 	textureMock := new(mockTexture)
 	receiverMock := new(mockReceiver)
 
-	texture := image.Pt(400, 400)
+	texture := image.Pt(800, 800)
 	screenMock.On("NewTexture", texture).Return(textureMock, nil)
 	receiverMock.On("Update", textureMock).Return()
 	loop := Loop{
@@ -68,7 +68,7 @@ func TestLoop_Post_Multiple_Success(t *testing.T) {
 	operation1.AssertCalled(t, "Do", textureMock)
 	operation2.AssertCalled(t, "Do", textureMock)
 	receiverMock.AssertCalled(t, "Update", textureMock)
-	screenMock.AssertCalled(t, "NewTexture", image.Pt(400, 400))
+	screenMock.AssertCalled(t, "NewTexture", image.Pt(800, 800))
 }
 
 func TestLoop_Post_Failure(t *testing.T) {
@@ -76,7 +76,7 @@ func TestLoop_Post_Failure(t *testing.T) {
 	textureMock := new(mockTexture)
 	receiverMock := new(mockReceiver)
 
-	texture := image.Pt(400, 400)
+	texture := image.Pt(800, 800)
 	screenMock.On("NewTexture", texture).Return(textureMock, nil)
 	receiverMock.On("Update", textureMock).Return()
 	loop := Loop{
@@ -95,7 +95,7 @@ func TestLoop_Post_Failure(t *testing.T) {
 
 	operation1.AssertCalled(t, "Do", textureMock)
 	receiverMock.AssertNotCalled(t, "Update", textureMock)
-	screenMock.AssertCalled(t, "NewTexture", image.Pt(400, 400))
+	screenMock.AssertCalled(t, "NewTexture", image.Pt(800, 800))
 }
 
 type mockScreen struct {
