@@ -140,6 +140,13 @@ func (pw *Visualizer) handleEvent(e any, t screen.Texture) {
 func (pw *Visualizer) drawDefaultUI() {
 	pw.w.Fill(pw.sz.Bounds(), color.White, draw.Src) // Фон.
 
+	x, y := pw.center.X, pw.center.Y
+	yellow := color.RGBA{R: 255, G: 255, B: 0, A: 255} // Жовтий колір.
+
+	// Малювання T.
+	pw.w.Fill(image.Rect(x-60, y+140, x+60, y-140), yellow, draw.Src)
+	pw.w.Fill(image.Rect(x-150, y, x+150, y-140), yellow, draw.Src)
+
 	// Малювання білої рамки.
 	for _, br := range imageutil.Border(pw.sz.Bounds(), 10) {
 		pw.w.Fill(br, color.White, draw.Src)
