@@ -83,8 +83,9 @@ func (p *Parser) parse(commandLine string) error {
 	}
 	var iArgs []int
 	for _, arg := range args {
-		i, err := strconv.Atoi(arg)
+		f, err := strconv.ParseFloat(arg, 64)
 		if err == nil {
+			i := int(f * 800)
 			iArgs = append(iArgs, i)
 		}
 	}
