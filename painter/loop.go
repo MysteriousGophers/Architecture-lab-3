@@ -16,7 +16,7 @@ type Loop struct {
 	next screen.Texture
 	prev screen.Texture
 
-	mq messageQueue
+	Mq messageQueue
 
 	stop    chan struct{}
 	stopReq bool
@@ -28,10 +28,10 @@ func (l *Loop) Start(s screen.Screen) {
 	l.next, _ = s.NewTexture(size)
 	l.prev, _ = s.NewTexture(size)
 
-	l.stop = make(chan struct{})
+	l.Mq = messageQueue{}
 	go func() {
-		for !l.stopReq || !l.mq.empty() {
-			op := l.mq.pull()
+		for !l.stopReq || !l.Mq.Empty() {
+			op := l.Mq.Pull()
 			if update := op.Do(l.next); update {
 				l.Receiver.Update(l.next)
 				l.next, l.prev = l.prev, l.next
@@ -42,7 +42,7 @@ func (l *Loop) Start(s screen.Screen) {
 }
 
 func (l *Loop) Post(op Operation) {
-	l.mq.push(op)
+	l.Mq.Push(op)
 }
 
 func (l *Loop) StopAndWait() {
@@ -53,38 +53,38 @@ func (l *Loop) StopAndWait() {
 }
 
 type messageQueue struct {
-	ops        []Operation
+	Ops        []Operation
 	mu         sync.Mutex
 	pushSignal chan struct{}
 }
 
-func (mq *messageQueue) push(op Operation) {
+func (mq *messageQueue) Push(op Operation) {
 	mq.mu.Lock()
 	defer mq.mu.Unlock()
-	mq.ops = append(mq.ops, op)
+	mq.Ops = append(mq.Ops, op)
 	if mq.pushSignal != nil {
 		close(mq.pushSignal)
 		mq.pushSignal = nil
 	}
 }
 
-func (mq *messageQueue) pull() Operation {
+func (mq *messageQueue) Pull() Operation {
 	mq.mu.Lock()
 	defer mq.mu.Unlock()
-	for len(mq.ops) == 0 {
+	for len(mq.Ops) == 0 {
 		mq.pushSignal = make(chan struct{})
 		mq.mu.Unlock()
 		<-mq.pushSignal
 		mq.mu.Lock()
 	}
-	op := mq.ops[0]
-	mq.ops[0] = nil
-	mq.ops = mq.ops[1:]
+	op := mq.Ops[0]
+	mq.Ops[0] = nil
+	mq.Ops = mq.Ops[1:]
 	return op
 }
 
-func (mq *messageQueue) empty() bool {
+func (mq *messageQueue) Empty() bool {
 	mq.mu.Lock()
 	defer mq.mu.Unlock()
-	return len(mq.ops) == 0
+	return len(mq.Ops) == 0
 }
